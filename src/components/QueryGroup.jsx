@@ -23,7 +23,7 @@ const QueryGroup = ({ group, handleAddElement, handleRemoveGroup, handleElementC
           </Select>
         </FormControl>
         <Button variant="contained" onClick={() => handleAddElement()} style={{ marginLeft: 5, backgroundColor: "#27374D" }}>Add</Button>
-        <Button variant="outlined" onClick={handleRemoveGroup} style={{ marginLeft: 5, color: "#27374D", borderColor: "#27374D" }}>Remove</Button>
+        {/* <Button variant="outlined" onClick={handleRemoveGroup} style={{ marginLeft: 5, color: "#27374D", borderColor: "#27374D" }}>Remove</Button> */}
       </Box>
       {group.elements.map((element, index) => (
         <QueryElement

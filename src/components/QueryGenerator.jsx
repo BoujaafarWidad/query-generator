@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import QueryGroup from "./QueryGroup";
-import { Box, Button } from '@mui/material';
+import { Box, Button, Chip, Stack } from '@mui/material';
 import QueryDialog from './Dialog';
 import { Bars } from 'react-loader-spinner'
+import { useDrop } from 'react-dnd';
 
 const QueryGenerator = () => {
   const [groups, setGroups] = useState([
@@ -14,16 +15,7 @@ const QueryGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [generatedRequest, setGeneratedRequest] = useState("")
   const [open, setOpen] = React.useState(false);
-
-  const handleAddGroup = () => {
-    setGroups([...groups, { status: 'AND', elements: [] }]);
-  };
-
-  const handleRemoveGroup = (index) => {
-    const newGroups = [...groups];
-    newGroups.splice(index, 1);
-    setGroups(newGroups);
-  };
+  const [attributes, setAttributes] = useState([]);
 
   const handleAddElement = (groupIndex) => {
     const newGroups = [...groups];
@@ -57,8 +49,7 @@ const QueryGenerator = () => {
     setLoading(true);
 
     setTimeout(() => {
-      const tableName = 'your_table';
-      const selectColumns = ['column1', 'column2', 'column3'];
+      const tableName = 'client_table';
       const sqlQueries = groups.map((group) => {
         const groupConditions = group.elements.map((element) => {
           const fieldName = element.field;
@@ -80,31 +71,67 @@ const QueryGenerator = () => {
 
         return `(${groupSQL})`;
       });
+      let fullSQL = "";
+      if (groups[0].elements.length === 1 && groups[0].elements[0].value === "") {
+        fullSQL = `SELECT ${attributes.join(', ')} FROM ${tableName}`;
+      } else {
+        fullSQL = `SELECT ${attributes.join(', ')} FROM ${tableName} WHERE ${sqlQueries};`;
 
-      const finalSQL = sqlQueries.join(' AND ');
-
-      const fullSQL = `SELECT ${selectColumns.join(', ')} FROM ${tableName} WHERE ${finalSQL};`;
-
+      }
       setGeneratedRequest(fullSQL)
       setLoading(false);
       setOpen(true)
     }, 1000);
   };
 
+  const [{ canDrop, isOver }, drop] = useDrop({
+    accept: 'ATTRIBUTE',
+    drop: (item) => handleDrop(item.attribute),
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  });
+
+  const handleDrop = (attribute) => {
+    if (!attributes.includes(attribute)) {
+      setAttributes([...attributes, attribute]);
+    }
+  };
+
+  const handleDelete = (attribute) => {
+    const newList = attributes.filter((item) => item !== attribute);
+    setAttributes(newList);
+  }
+
 
   return (
     <Box>
       <Box style={{ display: "flex", marginBottom: 20 }}>
-        <Button variant="contained" onClick={handleAddGroup} style={{ backgroundColor: "#27374D" }}>
-          Add Group
-        </Button>
       </Box>
+      <div ref={drop} style={{ border: '1px solid #ccc', padding: '20px' }}>
+        <div>
+          <strong>Selected Attributes:</strong>
+          <Stack direction="row" spacing={1} style={{ display: "flex", justifyContent: "center", padding: 10, flexWrap: "wrap" }}>
+            {attributes.map((attribute, index) => (
+              <Chip
+                key={index}
+                style={{
+                  minWidth: 150, margin: 5, backgroundColor: "#9DB2BF", fontFamily: "Roboto", fontSize: 14
+                }}
+                label={attribute}
+                onDelete={() => handleDelete(attribute)}
+              />
+            ))}
+          </Stack>
+        </div>
+        {isOver && canDrop && <div>Drop here</div>}
+      </div>
       {groups.map((group, groupIndex) => (
         <QueryGroup
           key={groupIndex}
           group={group}
           handleAddElement={() => handleAddElement(groupIndex)}
-          handleRemoveGroup={() => handleRemoveGroup(groupIndex)}
           handleElementChange={(elementIndex, field, value) =>
             handleElementChange(groupIndex, elementIndex, field, value)
           }
