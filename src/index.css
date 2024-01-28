@@ -1,13 +1,66 @@
 body {
+  font-family: Arial, sans-serif;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+main {
+  padding: 20px;
+}
+
+#attribute-list {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.attribute {
+  background-color: #f0f0f0;
+  padding: 8px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.attribute.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+#generate-query-btn {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+#loading-bar {
+  height: 10px;
+  background-color: #007bff;
+  width: 0;
+  margin-top: 10px;
+  transition: width 0.5s ease;
+}
+
+.loading {
+  animation: loading-animation 1s infinite;
+}
+
+@keyframes loading-animation {
+  0% {
+    width: 0;
+  }
+
+  50% {
+    width: 50%;
+  }
+
+  100% {
+    width: 100%;
+  }
+}
+
+/* Add this to your stylesheets */
+.dragging {
+  opacity: 0.5;
+  /* or any other styling to indicate dragging */
+  cursor: grabbing;
 }
